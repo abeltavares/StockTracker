@@ -1,0 +1,24 @@
+<!-- FILEPATH: /finnhub_app/templates/login.html -->
+
+<!-- This HTML file represents the login page of the Stock Tracker application. It extends the 'home.html' template. -->
+
+<!DOCTYPE html>
+{% extends 'home.html' %}
+{% block content %}
+
+<!-- The content block contains the header and the login form. -->
+
+<div class="header-bar">
+    <h1>Stock Tracker</h1>
+</div>
+
+<div class="card-body">
+    <form method="POST">
+        {% csrf_token %}
+        {{form.as_p}}
+        <input class="button" type="submit" value="Login">
+    </form>
+    <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
+</div>
+
+{% endblock content %}

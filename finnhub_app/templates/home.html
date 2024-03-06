@@ -1,0 +1,93 @@
+<!-- FILEPATH: /finnhub_app/templates/home.html -->
+
+<!--
+    This HTML file represents the home page template for a Stock Tracker web application.
+    It contains the necessary HTML structure and styles for the page layout.
+
+    The file consists of the following sections:
+    - Document type declaration and opening HTML tag
+    - Head section with the page title and CSS styles
+    - Body section with a container for centering the content
+    - A block for dynamic content
+
+    CSS classes are used to style different elements within the page, such as the header bar,
+    card body, button, and form elements.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Tracker</title>
+    <style>
+        /* CSS for centering the content */
+        .center-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Align items to the start of the container */
+            align-items: center;
+            height: 100vh; /* This makes the container take up the full viewport height */
+            text-align: center; /* This centers text within the container */
+            width: 100%; /* Ensure the container takes the full width */
+            margin-top: 20%; /* Adjust this value to position the content more towards the top */
+        }
+
+
+        /* Styles for the header bar */
+        .header-bar {
+            background-color: #333;
+            color: white;
+            padding: 2px 0;
+            text-align: center;
+            width: 26.1%; /* Ensure the header takes the full width of the container */
+        }
+
+        /* Styles for the card-body */
+        .card-body {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%; /* Adjust the width as needed */
+            max-width: 400px; /* Ensures the card doesn't get too wide on large screens */
+        }
+
+        /* Styles for the button */
+        .button {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .button:hover {
+            background-color: #444;
+        }
+
+        /* Styles for form elements */
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 90%; /* Adjust this value as needed */
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="center-container">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

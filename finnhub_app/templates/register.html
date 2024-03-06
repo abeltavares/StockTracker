@@ -1,0 +1,35 @@
+<!-- FILEPATH: /finnhub_app/templates/register.html -->
+
+<!--
+This HTML file represents the registration page of the Stock Tracker application.
+It extends the 'home.html' template and contains a form for user registration.
+The form includes fields for username, password, and password confirmation.
+Users can submit the form to register their account.
+If the user already has an account, they can click on the 'Login' link to navigate to the login page.
+-->
+
+<!DOCTYPE html>
+{% extends 'home.html' %}
+{% block content %}
+
+<div class="header-bar">
+    <h1>Stock Tracker</h1>
+</div>
+
+<div class="card-body">
+    <form method="POST">
+        {% csrf_token %}
+        <label> {{form.username.label}}</label>
+        {{form.username}}
+
+        <label> {{form.password1.label}}</label>
+        {{form.password1}}
+
+        <label> {{form.password2.label}}</label>
+        {{form.password2}}
+        <input style="margin-top:10px" class="button" type="submit" value="Register">
+    </form>
+    <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,227 @@
+<!-- FILEPATH: /finnhub_app/templates/stocks.html -->
+
+<!--
+This HTML template file is used to display the stock tracker dashboard. It extends the 'home.html' template and contains the following sections:
+
+1. Styles: Defines the CSS styles for the elements in the template.
+2. Header: Displays the title "Stock Tracker".
+3. Add Stock Form: Allows users to add a stock symbol to the portfolio.
+4. No Stocks Message: Displays a message when there are no stocks in the portfolio.
+5. Stock Table: Displays a table with the stock symbols, prices, and an action button to delete a stock.
+6. JavaScript: Contains functions to update the dashboard, delete a stock, and handle form submission using AJAX.
+7. Logout Form: Allows users to logout from the application.
+
+The template uses Django template tags to include dynamic content and perform server-side operations.
+
+Note: The template assumes the presence of the 'home.html' template and the necessary JavaScript libraries (jQuery).
+-->
+<!DOCTYPE html>
+{% extends 'home.html' %}
+{% block content %}
+
+<style>
+    .logout-container {
+        margin-top: 50px;
+    }
+
+    #stock-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 30px;
+    }
+
+    #stock-table th, #stock-table td {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-top: 100px;
+        text-align: center;
+    }
+
+    #stock-table th {
+        background-color: #f2f2f2;
+        color: black;
+    }
+
+    #stock-table th:last-child, #stock-table td:last-child {
+        border: none;
+        background-color: transparent;
+        color: transparent;
+        width: 10px;
+    }
+
+    #stock-table th:last-child {
+        color: transparent;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 20px;
+    }
+
+    #add-stock-form {
+        margin-bottom: 45px;
+    }
+</style>
+
+<div class="header-bar">
+    <h1>Stock Tracker</h1>
+</div>
+
+<div class="card-body">
+    <!-- Add Stock Form -->
+    <form id="add-stock-form">
+        {% csrf_token %}
+        <label for="symbol">Stock Symbol:</label>
+        <input type="text" id="symbol" name="symbol" required>
+        <button type="submit">Add Stock</button>
+    </form>
+
+    <div id="no-stocks-message" class="no-data" style="display: none;">
+        No stocks in portfolio.
+    </div>
+
+    <table id="stock-table">
+        <tr>
+            <th>Symbol</th>
+            <th>Price</th>
+            <th>Action</th>
+        </tr>
+    </table>
+
+    <script>
+        function updateDashboard() {
+            fetch('/api/stock-data/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('First data:', data);
+                    const noStocksMessage = document.getElementById('no-stocks-message');
+                    const table = document.getElementById('stock-table');
+                    if (data.length === 0) {
+                        noStocksMessage.style.display = 'block';
+                        table.style.display = 'none';
+                        return;
+                    }
+
+                    const symbols = data.map(stock => stock.symbol);
+
+                    const fetchPromises = symbols.map(symbol => {
+                        return fetch('/stock-data/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                            },
+                            body: `symbol=${encodeURIComponent(symbol)}`
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to fetch and store stock data');
+                            }
+                            return response.json();
+                        })
+                        .catch(error => {
+                            console.error('There was a problem with the fetch operation:', error);
+                        });
+                    });
+
+                    Promise.all(fetchPromises)
+                        .then(() => {
+                            fetch('/api/stock-data/')
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.length > 0) {
+                                        console.log('Fetched data:', data);
+                                        table.innerHTML = '<tr><th>Symbol</th><th>Price</th><th>Action</th></tr>';
+                                        data.forEach(stock => {
+                                            const row = document.createElement('tr');
+                                            row.innerHTML = `<td>${stock.symbol}</td><td>${stock.price}</td><td><button onclick="deleteStock('${stock.symbol}')">X</button></td>`;
+                                            table.appendChild(row);
+                                        });
+                                    } else {
+                                        noStocksMessage.style.display = 'block';
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('There was a problem with the fetch operation:', error);
+                                });
+                        });
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+
+        function deleteStock(symbol) {
+            fetch('/delete-stock/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: `symbol=${encodeURIComponent(symbol)}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete stock');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    updateDashboard();
+                } else {
+                    console.error('Failed to delete stock:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+        }
+
+        updateDashboard();
+        setInterval(updateDashboard, 60000);
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#add-stock-form').on('submit', function(event) {
+                event.preventDefault();
+                var symbol = $('#symbol').val();
+                $.ajax({
+                    url: "{% url 'fetch_stock_data' %}",
+                    type: "POST",
+                    data: {
+                        symbol: symbol,
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                    },
+                    success: function(response) {
+                        if (response.error) {
+                            alert(response.error);
+                        } else {
+                            alert(response.message);
+                            const noStocksMessage = document.getElementById('no-stocks-message');
+                            const table = document.getElementById('stock-table');
+                            noStocksMessage.style.display = 'none';
+                            table.style.display = 'table';
+                            updateDashboard();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('An error occurred: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- Logout form -->
+    <div class="logout-container">
+        <form method="POST" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}

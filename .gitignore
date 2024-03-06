@@ -1,0 +1,23 @@
+#python bytecode files
+*.pyc
+*.pyo
+**/__pycache__/
+
+#log files
+*.log
+
+#ignore all .env files
+**/.env
+
+# IntelliJ files
+.idea_modules
+*.iml
+*.iws
+*.ipr
+.idea/
+build/
+*/build/
+out/
+
+# VSCode files
+.vscode
