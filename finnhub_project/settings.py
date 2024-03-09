@@ -12,24 +12,49 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from .env file
-load_dotenv()
+# SECURE_HSTS_INCLUDE_SUBDOMAINS: If True, the SecurityMiddleware will add the includeSubDomains tag to the HTTP Strict Transport
+# Security header. It has security implications including preventing your site from being accessed over an insecure connection.
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
+# SECURE_HSTS_PRELOAD: If True, the SecurityMiddleware will add the preload directive to the HTTP Strict Transport Security header.
+# This is an opt-in feature and has serious implications. Only use this when you're sure all subdomains of your domain should be
+# served exclusively via SSL.
+SECURE_HSTS_PRELOAD = False
+
+# SECURE_HSTS_SECONDS: The number of seconds a browser should remember that this site is only to be accessed using HTTPS.
+# SECURE_HSTS_SECONDS = 60
+
+# Redirect all non-HTTPS requests to HTTPS
+# SECURE_SSL_REDIRECT: If True, the SecurityMiddleware will redirect all non-HTTPS requests to HTTPS (except for those URLs matching
+# a regular expression listed in SECURE_REDIRECT_EXEMPT).
+SECURE_SSL_REDIRECT = False
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-h7e$@*80u_j+*w9hsz6_(3*n2fomsgzqe3a$3&%nls!=l27s$+"
+# SECRET_KEY: This is the secret key for this particular Django installation. Used to provide cryptographic signing, and should be set
+# to a unique, unpredictable value.
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+# Ensures that the session and CSRF cookie is only sent over HTTPS
+# SESSION_COOKIE_SECURE: If True, the session cookie will be marked as “secure,” which means browsers may ensure that the cookie is
+# only sent with an HTTPS connection.
+SESSION_COOKIE_SECURE = False
+
+# CSRF_COOKIE_SECURE: If True, the CSRF cookie will be marked as “secure,” which means browsers may ensure that the cookie is only sent
+# under an HTTPS connection.
+CSRF_COOKIE_SECURE = False
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG: A boolean that turns on/off debug mode. When it is True, the server will provide detailed error pages. If False, the server
+# will provide generic error pages.
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost"]
+# ALLOWED_HOSTS: A list of strings representing the host/domain names that this Django site can serve. This is a security measure to
+# prevent HTTP Host header attacks, which are possible even under many seemingly-safe web server configurations.
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -41,7 +66,6 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
 ]
 
 MIDDLEWARE = [
@@ -53,6 +77,12 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# Content Security Policy (CSP) settings
+# CSP is a security measure that helps prevent Cross-Site Scripting (XSS) attacks.
+# It does this by specifying the domains that the browser should consider to be valid sources of executable scripts.
+# A CSP compatible browser will then only execute scripts loaded in source files received from those whitelisted domains.
+# Here, we set the default source to 'self', which means only use resources from the current origin (same scheme, host and port).
 
 ROOT_URLCONF = "finnhub_project.urls"
 
@@ -112,6 +142,22 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# List of password hashing algorithms that Django will use to store passwords.
+# The first hasher in the list is the default hasher that Django will use.
+PASSWORD_HASHERS = [
+    # Argon2 is a password hashing algorithm that won the Password Hashing Competition in 2015.
+    # It is designed to be resistant to a number of known attacks and provides a high degree of customization.
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    # PBKDF2 (Password-Based Key Derivation Function 2) is a key stretching algorithm that Django uses by default.
+    # It is compliant with NIST recommendations.
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    # PBKDF2SHA1 is a variant of PBKDF2 that uses SHA1 as the pseudorandom function.
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    # BCryptSHA256PasswordHasher is a password hasher that uses the BCrypt algorithm, with a SHA256 hash used to preprocess the password.
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+    # BCryptPasswordHasher is a password hasher that uses the BCrypt algorithm.
+    "django.contrib.auth.hashers.BCryptPasswordHasher",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/

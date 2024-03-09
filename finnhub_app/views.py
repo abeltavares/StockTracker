@@ -1,17 +1,16 @@
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django_ratelimit.decorators import ratelimit
 from jsonschema import ValidationError
 from .models import Stock
-import requests
-import os
 from .models import Portfolio
 from .forms import UserRegistrationForm
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
 from .services import get_stock_data
 
 
 @login_required
+@ratelimit(key="ip", rate="5/m", block=True)
 def home(request):
     """
     Renders the home page for the authenticated user.
@@ -28,6 +27,7 @@ def home(request):
     return render(request, "stocks.html", {"portfolio": portfolio})
 
 
+@ratelimit(key="ip", rate="5/m", block=True)
 def register(request):
     """
     User Registration form
@@ -81,6 +81,7 @@ def delete_stock(request):
 
 
 @login_required
+@ratelimit(key="ip", rate="60/m", block=True)
 def fetch_stock_data(request):
     """
     Fetches stock data for a given symbol and updates the user's portfolio.
@@ -131,6 +132,7 @@ def fetch_stock_data(request):
 
 
 @login_required
+@ratelimit(key="ip", rate="60/m", block=True)
 def stock_data_api(request):
     """
     API endpoint to fetch stock data for the user's portfolio.

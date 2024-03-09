@@ -1,10 +1,6 @@
 import os
 from jsonschema import ValidationError
 import requests
-from dotenv import load_dotenv
-
-load_dotenv()
-
 
 def get_stock_data(symbol):
     """
