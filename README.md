@@ -98,6 +98,40 @@ graph TD; Client(Browser) --> Django_Web_Server; Django_Web_Server --> URL_Dispa
 
 ```
 
+### Security Measures
+
+**Rate Limiting**: To protect against brute-force attacks and abuse, rate limiting has been implemented using the `ratelimit` decorator. This limits the number of requests a user can make to certain views within a specified timeframe. For example, users are limited to 5 requests per minute for the `home` and `register` views, and 60 requests per minute for the `fetch_stock_data` and `stock_data_api` views. This helps in mitigating potential denial-of-service (DoS) attacks and ensures fair usage of the application.
+
+**HTTPS and HSTS**: The application is configured to use HTTPS for secure communication and to enforce HTTP Strict Transport Security (HSTS) headers. This ensures that all connections to the application are made over HTTPS, protecting against man-in-the-middle attacks and cookie hijacking. The `SECURE_SSL_REDIRECT` setting is used to redirect all non-HTTPS requests to HTTPS, further enhancing security.
+
+**Content Security Policy (CSP)**: A Content Security Policy (CSP) has been implemented to help prevent Cross-Site Scripting (XSS) attacks. The policy specifies that only resources from the current origin should be considered valid sources of executable scripts, significantly reducing the risk of XSS attacks.
+
+**Secure Cookies**: The application is configured to send the session and CSRF cookies only over HTTPS connections. This ensures that these cookies are not exposed over unencrypted connections, protecting against session hijacking and CSRF attacks.
+
+**Password Hashing Algorithms**: Django's `PASSWORD_HASHERS` setting is configured to use multiple password hashing algorithms, including Argon2, PBKDF2, PBKDF2SHA1, BCryptSHA256, and BCrypt. These algorithms are designed to be resistant to various attacks and provide a high degree of security for stored passwords.
+
+**Environment Variables**: Sensitive data such as database credentials and API keys are stored as environment variables and not included directly in the code or version control system. This practice helps to keep this sensitive data secure and separate from the application's codebase.
+
+**Password Validators**: Django's `AUTH_PASSWORD_VALIDATORS` setting is used to check the strength of users' passwords when they are set. This includes checks for minimum length, common passwords, numeric passwords, and similarity to other attributes. These checks help ensure that users choose strong, secure passwords.
+
+**Clickjacking Protection**: While the current views in the Stock Tracker application do not return HTML responses, it's important to consider the protection against Clickjacking for future development. Clickjacking is a malicious technique that tricks users into clicking on hidden elements on a webpage, potentially leading to unintended actions. To mitigate this risk, the `X-Frame-Options` middleware is included in the Django project. This middleware sets the `X-Frame-Options` header to `DENY` for all responses that do not already have it, effectively preventing the application from being embedded within an iframe. This measure is crucial for any view that might return HTML content in the future, ensuring that the application remains secure against Clickjacking attacks.
+
+#### Note for Production Environment
+
+Before deploying the application to a production environment, ensure the following settings in `settings.py` are adjusted for security and performance:
+
+- `SECURE_HSTS_INCLUDE_SUBDOMAINS` can be set to `True` to include all subdomains in the HSTS policy.
+- `SECURE_HSTS_PRELOAD` can be set to `True` to include the preload directive in the HSTS header.
+- `SECURE_HSTS_SECONDS` can be set to a suitable value (e.g., `31536000` for 1 year) to specify how long browsers should remember that this site is only to be accessed using HTTPS.
+- `SECURE_SSL_REDIRECT` can be set to `True` to redirect all non-HTTPS requests to HTTPS.
+- `SECRET_KEY` should be kept secret and not exposed in your version control system.
+- `SESSION_COOKIE_SECURE` and `CSRF_COOKIE_SECURE` can be set to `True` to ensure cookies are only sent over HTTPS.
+- `DEBUG` should be set to `False` to turn off debug mode in production.
+- `ALLOWED_HOSTS` should be updated to include the domain names that your Django site can serve.
+
+These changes are crucial for enhancing the security and performance of the application in a production environment.
+These can be set in the settings.py file of the Django project.
+
 
 ## Setup and Installation
 
@@ -158,10 +192,11 @@ The current implementation of the Stock Tracker application provides basic funct
 **Historical Data**: 
     The application could provide historical data for each stock, allowing users to see how the stock's price has changed over time.
 
+**Kafka and Kubernetes**: Kafka can handle the real-time data streaming part of the application, collecting, processing, and distributing real-time data to various components of the system. Kubernetes can then manage the deployment and scaling of these components, ensuring that the application can handle increased load efficiently.
 
 For users interested in exploring historical data for stocks, check out the [Financial Dashboard App](https://abeltavares-financial-dashboard-app-app-ozm3yd.streamlit.app/) for a view of historical stock data analysis.
 
-These are just a few suggestions for future work and considerations. The possibilities for expanding and improving the application are vast, and these improvements would enhance the user experience and the application's usefulness.
+By considering these future work and considerations, the Stock Tracker application can be significantly enhanced, providing a more responsive and scalable platform for tracking real-time stock prices.
 
 ## Contributing
 

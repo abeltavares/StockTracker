@@ -30,14 +30,15 @@
             margin-top: 20%; /* Adjust this value to position the content more towards the top */
         }
 
-
         /* Styles for the header bar */
         .header-bar {
             background-color: #333;
             color: white;
             padding: 2px 0;
             text-align: center;
-            width: 26.1%; /* Ensure the header takes the full width of the container */
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
         }
 
         /* Styles for the card-body */
@@ -46,8 +47,9 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 80%; /* Adjust the width as needed */
+            width: 80%;
             max-width: 400px; /* Ensures the card doesn't get too wide on large screens */
+            margin: 0 auto;
         }
 
         /* Styles for the button */
@@ -72,7 +74,7 @@
         }
 
         input[type="text"], input[type="password"] {
-            width: 90%; /* Adjust this value as needed */
+            width: 90%;
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ddd;
