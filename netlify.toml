@@ -1,0 +1,11 @@
+[build]
+  command = "python manage.py collectstatic --noinput"
+
+[build.environment]
+  DJANGO_SETTINGS_MODULE = "finnhub_project.settings"
+
+[context.production]
+  command = "python manage.py migrate --noinput"
+
+[context.deploy-preview]
+  command = "python manage.py migrate --noinput"
